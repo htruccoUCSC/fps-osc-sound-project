@@ -1,8 +1,7 @@
 {
-    "name": "fps.AI",
+    "name": "OSCHandler.Runtime",
     "references": [
-        "GUID:9c5543eabb73a6249ac07b2c065ee8b4",
-        "GUID:7f3a2d1e6c5942b3a1c9d8e7f0b2a4c6"
+        "GUID:4d2c8f6f7f1c4e1ab2c1f4f5d3b6a7c8"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -359,6 +359,8 @@ namespace Unity.FPS.AI
 
         void OnDie()
         {
+            OSCHandler.Instance.SendMessageToClient("pd", "/unity/robodeath", 1);
+
             // spawn a particle system when dying
             var vfx = Instantiate(DeathVfx, DeathVfxSpawnPoint.position, Quaternion.identity);
             Destroy(vfx, 5f);

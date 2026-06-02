@@ -127,6 +127,8 @@ namespace Unity.FPS.Game
         public AudioClip ContinuousShootStartSfx;
         public AudioClip ContinuousShootLoopSfx;
         public AudioClip ContinuousShootEndSfx;
+        [Tooltip("Send OSC sound events instead of playing the built-in firing clips")]
+        public bool UseOscShootSound = false;
         AudioSource m_ContinuousShootAudioSource = null;
         bool m_WantsToShoot = false;
 
@@ -311,6 +313,11 @@ namespace Unity.FPS.Game
 
         void UpdateContinuousShootSound()
         {
+            if (UseOscShootSound)
+            {
+                return;
+            }
+
             if (UseContinuousShootSound)
             {
                 if (m_WantsToShoot && m_CurrentAmmo >= 1f)
@@ -475,7 +482,11 @@ namespace Unity.FPS.Game
             m_LastTimeShot = Time.time;
 
             // play shoot SFX
-            if (ShootSfx && !UseContinuousShootSound)
+            if (UseOscShootSound)
+            {
+                OSCHandler.Instance.SendMessageToClient("pd", "/unity/laser", 1);
+            }
+            else if (ShootSfx && !UseContinuousShootSound)
             {
                 m_ShootAudioSource.PlayOneShot(ShootSfx);
             }

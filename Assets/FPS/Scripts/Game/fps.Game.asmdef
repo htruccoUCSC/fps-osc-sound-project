@@ -1,7 +1,8 @@
 {
     "name": "fps.Game",
     "references": [
-        "GUID:1826c0224c0d048b88112c79bbb0cd85"
+        "GUID:1826c0224c0d048b88112c79bbb0cd85",
+        "GUID:7f3a2d1e6c5942b3a1c9d8e7f0b2a4c6"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
