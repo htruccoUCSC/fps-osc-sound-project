@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Unity.FPS.Game;
 
@@ -45,6 +45,7 @@ namespace Unity.FPS.Gameplay
         MaterialPropertyBlock m_OverheatMaterialPropertyBlock;
         float m_LastAmmoRatio;
         ParticleSystem.EmissionModule m_SteamVfxEmissionModule;
+        bool m_IsCoolingOscActive;
 
         void Awake()
         {
@@ -90,7 +91,27 @@ namespace Unity.FPS.Gameplay
             }
 
             // cooling sound
-            if (CoolingCellsSound)
+            if (m_Weapon.UseOscShootSound)
+            {
+                bool shouldCool = currentAmmoRatio != 1 && m_Weapon.IsWeaponActive && m_Weapon.IsCooling;
+                if (shouldCool)
+                {
+                    if (!m_IsCoolingOscActive)
+                    {
+                        OSCHandler.Instance.SendMessageToClient("pd", "/unity/reload", 1);
+                        m_IsCoolingOscActive = true;
+                    }
+                }
+                else
+                {
+                    if (m_IsCoolingOscActive)
+                    {
+                        OSCHandler.Instance.SendMessageToClient("pd", "/unity/reload", 0);
+                        m_IsCoolingOscActive = false;
+                    }
+                }
+            }
+            else if (CoolingCellsSound)
             {
                 if (!m_AudioSource.isPlaying
                     && currentAmmoRatio != 1
@@ -110,6 +131,15 @@ namespace Unity.FPS.Gameplay
             }
 
             m_LastAmmoRatio = currentAmmoRatio;
+        }
+
+        void OnDisable()
+        {
+            if (m_IsCoolingOscActive)
+            {
+                OSCHandler.Instance.SendMessageToClient("pd", "/unity/reload", 0);
+                m_IsCoolingOscActive = false;
+            }
         }
     }
 }
