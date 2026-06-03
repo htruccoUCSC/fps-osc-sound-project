@@ -161,6 +161,9 @@ namespace Unity.FPS.Game
 
         public bool IsReloading { get; private set; }
 
+        bool m_IsReloadOscActive;
+        float m_ReloadOscResetTime = Mathf.NegativeInfinity;
+
         const string k_AnimAttackParameter = "Attack";
 
         private Queue<Rigidbody> m_PhysicalAmmoPool;
@@ -233,6 +236,19 @@ namespace Unity.FPS.Game
             {
                 GetComponent<Animator>().SetTrigger("Reload");
                 IsReloading = true;
+                OSCHandler.Instance.SendMessageToClient("pd", "/unity/reload", 1);
+                m_IsReloadOscActive = true;
+                m_ReloadOscResetTime = Time.time + 3f;
+            }
+        }
+
+        void UpdateReloadOsc()
+        {
+            if (m_IsReloadOscActive && Time.time >= m_ReloadOscResetTime)
+            {
+                OSCHandler.Instance.SendMessageToClient("pd", "/unity/reload", 0);
+                m_IsReloadOscActive = false;
+                m_ReloadOscResetTime = Mathf.NegativeInfinity;
             }
         }
 
@@ -241,6 +257,7 @@ namespace Unity.FPS.Game
             UpdateAmmo();
             UpdateCharge();
             UpdateContinuousShootSound();
+            UpdateReloadOsc();
 
             if (Time.deltaTime > 0)
             {
