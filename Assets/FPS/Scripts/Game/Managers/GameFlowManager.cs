@@ -43,6 +43,21 @@ namespace Unity.FPS.Game
         {
             AudioUtility.SetMasterVolume(1);
             OSCHandler.Instance.SendMessageToClient("pd", "/unity/music", 1);
+
+            // Dynamically instantiate DynamicMusicController so it works in all gameplay scenes without manual setup
+            System.Type musicControllerType = System.Type.GetType("Unity.FPS.Gameplay.DynamicMusicController, fps.Gameplay");
+            if (musicControllerType != null)
+            {
+                if (FindAnyObjectByType(musicControllerType) == null)
+                {
+                    GameObject dynamicMusicObj = new GameObject("DynamicMusicController");
+                    dynamicMusicObj.AddComponent(musicControllerType);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("DynamicMusicController type could not be loaded dynamically.");
+            }
         }
 
         void Update()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -163,6 +163,7 @@ namespace Unity.FPS.Game
 
         bool m_IsReloadOscActive;
         float m_ReloadOscResetTime = Mathf.NegativeInfinity;
+        float m_PreviousAmmo;
 
         const string k_AnimAttackParameter = "Attack";
 
@@ -199,6 +200,8 @@ namespace Unity.FPS.Game
                     m_PhysicalAmmoPool.Enqueue(shell.GetComponent<Rigidbody>());
                 }
             }
+
+            m_PreviousAmmo = m_CurrentAmmo;
         }
 
         public void AddCarriablePhysicalBullets(int count) => m_CarriedPhysicalBullets = Mathf.Max(m_CarriedPhysicalBullets + count, MaxAmmo);
@@ -264,6 +267,17 @@ namespace Unity.FPS.Game
                 MuzzleWorldVelocity = (WeaponMuzzle.position - m_LastMuzzlePosition) / Time.deltaTime;
                 m_LastMuzzlePosition = WeaponMuzzle.position;
             }
+
+            // Detect reload / full charge and overheat / empty state transitions
+            if (m_PreviousAmmo > 0f && m_CurrentAmmo <= 0f)
+            {
+                OSCHandler.Instance.SendMessageToClient("pd", "/unity/overheat", 1);
+            }
+            else if (m_PreviousAmmo < MaxAmmo && m_CurrentAmmo >= MaxAmmo)
+            {
+                OSCHandler.Instance.SendMessageToClient("pd", "/unity/fullcharge", 1);
+            }
+            m_PreviousAmmo = m_CurrentAmmo;
         }
 
         void UpdateAmmo()
